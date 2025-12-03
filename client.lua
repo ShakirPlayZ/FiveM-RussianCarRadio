@@ -20,7 +20,9 @@ local Config = {
     -- 3D Sound aktivieren (Sound kommt aus dem Fahrzeug)
     use3DSound = true,
     -- Max Distanz für 3D Sound (in Metern)
-    maxDistance = 30.0
+    maxDistance = 30.0,
+    -- Zeige Zuhörer-Anzahl im Lauftext
+    showListeners = false
 }
 
 -- Initialisierung
@@ -125,17 +127,21 @@ function PlayRadio()
     end
     
     -- Erstelle Sound mit xsound
+    -- WICHTIG: loop=true für kontinuierliches Streaming (Icecast Stream läuft durch)
     if Config.use3DSound then
         local coords = GetEntityCoords(vehicle)
-        exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
+        exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, true) -- true = loop
         exports.xsound:Distance(SOUND_ID, Config.maxDistance)
-        print("[Radio] Playing 3D stream at vehicle position")
+        print("[Radio] Playing 3D stream (looped)")
     else
-        exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
-        print("[Radio] Playing 2D stream")
+        exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, true) -- true = loop
+        print("[Radio] Playing 2D stream (looped)")
     end
     
     isPlaying = true
+    
+    -- Starte Metadata-Anzeige
+    StartMetadataDisplay()
     
     -- Update NUI
     SendNUIMessage({
@@ -153,6 +159,9 @@ function StopRadio()
     -- Stoppe Sound mit xsound
     exports.xsound:Destroy(SOUND_ID)
     isPlaying = false
+    
+    -- Stoppe Metadata-Anzeige
+    StopMetadataDisplay()
     
     print("[Radio] Stopped")
     
@@ -210,5 +219,77 @@ AddEventHandler('onResourceStop', function(resourceName)
         if isPlaying then
             exports.xsound:Destroy(SOUND_ID)
         end
+        StopMetadataDisplay()
+    end
+end)
+
+-- ==========================================
+-- METADATA DISPLAY SYSTEM
+-- ==========================================
+
+local metadataThread = nil
+local currentMetadata = "Lädt..."
+local showMetadata = false
+
+-- Starte Metadata-Anzeige
+function StartMetadataDisplay()
+    showMetadata = true
+    
+    -- Fordere initial Metadata an
+    TriggerServerEvent('radio:requestMetadata')
+    
+    -- Starte Thread für regelmäßige Updates
+    if metadataThread == nil then
+        metadataThread = Citizen.CreateThread(function()
+            while showMetadata do
+                Citizen.Wait(10000) -- Alle 10 Sekunden updaten
+                
+                if isPlaying then
+                    TriggerServerEvent('radio:requestMetadata')
+                end
+            end
+            metadataThread = nil
+        end)
+    end
+    
+    -- Starte Lauftext-Anzeige
+    Citizen.CreateThread(function()
+        while showMetadata and isPlaying do
+            Citizen.Wait(0)
+            
+            -- Lauftext oben rechts anzeigen
+            SetTextFont(4)
+            SetTextProportional(1)
+            SetTextScale(0.0, 0.4)
+            SetTextColour(255, 51, 51, 255)
+            SetTextDropshadow(0, 0, 0, 0, 255)
+            SetTextEdge(1, 0, 0, 0, 255)
+            SetTextDropShadow()
+            SetTextOutline()
+            SetTextEntry("STRING")
+            AddTextComponentString("🎵 " .. currentMetadata)
+            DrawText(0.85, 0.02) -- Oben rechts
+        end
+    end)
+end
+
+-- Stoppe Metadata-Anzeige
+function StopMetadataDisplay()
+    showMetadata = false
+    currentMetadata = "Lädt..."
+end
+
+-- Empfange Metadata vom Server
+RegisterNetEvent('radio:receiveMetadata')
+AddEventHandler('radio:receiveMetadata', function(songTitle, listeners)
+    if songTitle and songTitle ~= "" then
+        currentMetadata = songTitle
+        
+        -- Optional: Zeige auch Zuhörer-Anzahl
+        if Config.showListeners and listeners then
+            currentMetadata = songTitle .. " | 👥 " .. listeners
+        end
+        
+        print("[Radio] Metadata update: " .. currentMetadata)
     end
 end)

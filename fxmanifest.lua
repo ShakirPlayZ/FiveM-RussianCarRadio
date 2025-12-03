@@ -2,8 +2,8 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Manuel H.'
-description 'Russisches Auto-Radio mit Musik-Streaming (xsound version)'
-version '2.0.0'
+description 'Russisches Auto-Radio mit Musik-Streaming (xsound version) + Metadata Display'
+version '2.1.0'
 
 -- Dependencies
 dependency 'xsound'
@@ -11,6 +11,11 @@ dependency 'xsound'
 -- Client Scripts
 client_scripts {
     'client.lua'
+}
+
+-- Server Scripts
+server_scripts {
+    'server.lua'
 }
 
 -- UI Files
