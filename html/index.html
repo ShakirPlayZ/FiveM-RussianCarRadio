@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Blyad Car Radio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="radio-container" class="hidden">
+        <div class="radio-body" id="radioBody">
+            <!-- Radio Header -->
+            <div class="radio-header">
+                <div class="radio-brand">РАДИО</div>
+                <div class="header-buttons">
+                    <button class="minimize-btn" id="minimizeBtn">−</button>
+                    <button class="close-btn" id="closeBtn">✕</button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="radio-content" id="radioContent">
+
+            <!-- Display -->
+            <div class="radio-display">
+                <div class="display-screen">
+                    <div class="frequency-display" id="frequencyDisplay">
+                        <span class="status-text" id="statusText">ВЫКЛ</span>
+                    </div>
+                    <div class="volume-indicator">
+                        <span>VOL:</span>
+                        <span id="volumeValue">50</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Station Info (statt URL Input) -->
+            <div class="station-info">
+                <div class="station-name">BLYAD RADIO</div>
+                <div class="station-frequency">FM 100.0</div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="control-section">
+                <button class="control-btn play-btn" id="playBtn">
+                    <span class="btn-icon">▶</span>
+                    <span class="btn-label">PLAY</span>
+                </button>
+                <button class="control-btn pause-btn" id="pauseBtn">
+                    <span class="btn-icon">⏸</span>
+                    <span class="btn-label">PAUSE</span>
+                </button>
+            </div>
+
+            <!-- Volume Control -->
+            <div class="volume-section">
+                <button class="vol-btn" id="volDown">
+                    <span>−</span>
+                    <span class="vol-label">VOL</span>
+                </button>
+                <div class="volume-slider-container">
+                    <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        value="50" 
+                        class="volume-slider" 
+                        id="volumeSlider"
+                    >
+                    <div class="volume-track">
+                        <div class="volume-fill" id="volumeFill"></div>
+                    </div>
+                </div>
+                <button class="vol-btn" id="volUp">
+                    <span>+</span>
+                    <span class="vol-label">VOL</span>
+                </button>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="radio-speaker">
+                <div class="speaker-grill"></div>
+                <div class="speaker-grill"></div>
+                <div class="speaker-grill"></div>
+            </div>
+            </div> <!-- Ende radio-content -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
