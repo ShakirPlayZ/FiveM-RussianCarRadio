@@ -50,7 +50,7 @@ Ein FiveM Plugin für GTA 5 RP Server mit **xsound** - löst alle CORS/NUI Probl
 ## 🎮 Benutzung
 
 1. **In ein Fahrzeug einsteigen** - Als Fahrer
-2. **E-Taste drücken** - Radio öffnet sich unten rechts
+2. **Q-Taste drücken** - Radio öffnet sich unten rechts
 3. **PLAY klicken** - Musik startet sofort! ✅
 4. **Lautstärke regeln** - Mit Slider oder +/- Buttons
 5. **Minimize** - Orange Button minimiert das Radio
@@ -62,7 +62,7 @@ Ein FiveM Plugin für GTA 5 RP Server mit **xsound** - löst alle CORS/NUI Probl
 
 Ändere in `client.lua` (Zeile ~11):
 ```lua
-local STREAM_URL = "https://service4gamer.net/live"
+local STREAM_URL = "https://TLD/your-mount"
 ```
 
 Die URL nutzt jetzt **HTTPS mit SSL** für bessere Sicherheit und Kompatibilität! 🔒
@@ -74,7 +74,7 @@ In `client.lua` (Zeile ~19):
 local Config = {
     use3DSound = true,        -- true = Sound aus Fahrzeug, false = direkt im Kopf
     maxDistance = 30.0,       -- Maximale Hör-Distanz in Metern (nur bei 3D)
-    radioKey = 38,            -- 38 = E-Taste
+    radioKey = 85,            -- 38 = E-Taste, 85 = Q
     maxVolume = 100
 }
 ```
@@ -85,7 +85,7 @@ local Config = {
 **Lösung:** xsound ist nicht installiert oder nicht gestartet
 ```bash
 /ensure xsound
-/restart russian_car_radio
+/restart FiveM-RussianCarRadio
 ```
 
 ### Problem: Kein Ton
