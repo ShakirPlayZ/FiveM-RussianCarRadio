@@ -13,8 +13,8 @@ local SOUND_ID = "car_radio_stream"
 
 -- Konfiguration
 local Config = {
-    -- Taste zum Öffnen des Radios (E-Taste)
-    radioKey = 38,
+    -- Taste zum Öffnen des Radios (Q-Taste)
+    radioKey = 85,
     -- Maximale Lautstärke
     maxVolume = 100,
     -- 3D Sound aktivieren (Sound kommt aus dem Fahrzeug)
