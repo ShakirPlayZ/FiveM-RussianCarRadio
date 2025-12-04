@@ -179,30 +179,30 @@ function SetRadioVolume(volume)
     end
 end
 
--- NUI Callbacks mit Error Handling
+-- NUI Callbacks mit korrektem JSON Response
 RegisterNUICallback('close', function(data, cb)
     print("📻 [NUI] Close")
     CloseRadio()
-    cb('ok')
+    cb({status = 'ok'})
 end)
 
 RegisterNUICallback('play', function(data, cb)
     print("▶️ [NUI] Play callback received!")
     PlayRadio()
-    cb('ok')
+    cb({status = 'ok'})
 end)
 
 RegisterNUICallback('pause', function(data, cb)
     print("⏸️ [NUI] Pause")
     StopRadio()
-    cb('ok')
+    cb({status = 'ok'})
 end)
 
 RegisterNUICallback('volumeChange', function(data, cb)
     if data and data.volume then
         SetRadioVolume(data.volume)
     end
-    cb('ok')
+    cb({status = 'ok'})
 end)
 
 function ShowHelpNotification(msg)

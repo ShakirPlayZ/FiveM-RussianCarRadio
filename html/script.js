@@ -48,7 +48,7 @@ function setVolume(volume) {
         body: JSON.stringify({
             volume: currentVolume
         })
-    });
+    }).catch(err => console.error('Volume error:', err));
 }
 
 // Close Radio
@@ -62,7 +62,7 @@ function closeRadio() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({})
-    });
+    }).catch(err => console.error('Close error:', err));
 }
 
 // Toggle Minimize
@@ -92,7 +92,18 @@ playBtn.addEventListener('click', () => {
     })
     .then(resp => {
         console.log('✅ [NUI] Play request sent successfully');
-        return resp.json();
+        // Versuche JSON zu parsen, aber fange Fehler ab
+        return resp.text(); // Hole als Text statt JSON
+    })
+    .then(text => {
+        console.log('✅ [NUI] Response:', text);
+        // Versuche als JSON zu parsen
+        try {
+            const data = JSON.parse(text);
+            console.log('✅ [NUI] Parsed JSON:', data);
+        } catch(e) {
+            console.log('⚠️ [NUI] Response ist kein JSON, aber OK');
+        }
     })
     .catch(err => {
         console.error('❌ [NUI] Play request failed:', err);
@@ -104,7 +115,7 @@ pauseBtn.addEventListener('click', () => {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({})
-    });
+    }).catch(err => console.error('Pause error:', err));
 });
 
 volumeSlider.addEventListener('input', (e) => setVolume(parseInt(e.target.value)));
