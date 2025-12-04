@@ -270,12 +270,12 @@ body {
     box-shadow: 0 6px 15px rgba(0, 204, 0, 0.3);
 }
 
-.pause-btn {
-    border-color: #ffaa00;
+.stop-btn {
+    border-color: #cc0000;
 }
 
-.pause-btn:hover {
-    box-shadow: 0 6px 15px rgba(255, 170, 0, 0.3);
+.stop-btn:hover {
+    box-shadow: 0 6px 15px rgba(204, 0, 0, 0.3);
 }
 
 .btn-icon {

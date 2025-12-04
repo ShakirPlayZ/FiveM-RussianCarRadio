@@ -90,6 +90,7 @@ function CloseRadio()
         action = "closeRadio"
     })
     radioVisible = false
+    -- MUSIK LÄUFT WEITER! Nur UI wird geschlossen
 end
 
 function PlayRadio()

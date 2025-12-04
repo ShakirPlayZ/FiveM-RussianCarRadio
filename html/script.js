@@ -3,16 +3,14 @@
 
 let currentVolume = 50;
 let isPlaying = false;
-let isMinimized = false;
 
 // DOM Elements
 const radioContainer = document.getElementById('radio-container');
 const radioBody = document.getElementById('radioBody');
 const radioContent = document.getElementById('radioContent');
 const closeBtn = document.getElementById('closeBtn');
-const minimizeBtn = document.getElementById('minimizeBtn');
 const playBtn = document.getElementById('playBtn');
-const pauseBtn = document.getElementById('pauseBtn');
+const stopBtn = document.getElementById('stopBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 const volumeFill = document.getElementById('volumeFill');
 const volumeValue = document.getElementById('volumeValue');
@@ -23,7 +21,7 @@ const statusText = document.getElementById('statusText');
 // Update Display
 function updateDisplay() {
     if (isPlaying) {
-        statusText.textContent = 'EIN';
+        statusText.textContent = 'AN';
         statusText.style.color = '#00ff00';
     } else {
         statusText.textContent = 'AUS';
@@ -79,21 +77,8 @@ function closeRadio() {
     }).catch(err => console.error('Close error:', err));
 }
 
-// Toggle Minimize
-function toggleMinimize() {
-    isMinimized = !isMinimized;
-    if (isMinimized) {
-        radioBody.classList.add('minimized');
-        minimizeBtn.textContent = '▢';
-    } else {
-        radioBody.classList.remove('minimized');
-        minimizeBtn.textContent = '−';
-    }
-}
-
 // Event Listeners
 closeBtn.addEventListener('click', closeRadio);
-minimizeBtn.addEventListener('click', toggleMinimize);
 
 playBtn.addEventListener('click', () => {
     console.log('🎮 [NUI] Play Button clicked!');
@@ -124,12 +109,12 @@ playBtn.addEventListener('click', () => {
     });
 });
 
-pauseBtn.addEventListener('click', () => {
+stopBtn.addEventListener('click', () => {
     fetch(`https://${GetParentResourceName()}/pause`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({})
-    }).catch(err => console.error('Pause error:', err));
+    }).catch(err => console.error('Stop error:', err));
 });
 
 volumeSlider.addEventListener('input', (e) => setVolume(parseInt(e.target.value)));
