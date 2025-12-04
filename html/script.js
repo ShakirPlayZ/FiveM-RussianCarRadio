@@ -31,6 +31,20 @@ function updateDisplay() {
     }
 }
 
+// Update Now Playing Display
+function updateNowPlaying(songTitle) {
+    const nowPlayingText = document.getElementById('nowPlayingText');
+    if (nowPlayingText) {
+        if (songTitle && songTitle !== "" && songTitle !== "Lädt...") {
+            nowPlayingText.textContent = songTitle;
+            nowPlayingText.style.color = '#00ff00';
+        } else {
+            nowPlayingText.textContent = isPlaying ? 'Lädt...' : 'Kein Song';
+            nowPlayingText.style.color = isPlaying ? '#ffaa00' : '#666';
+        }
+    }
+}
+
 // Set Volume
 function setVolume(volume) {
     currentVolume = Math.max(0, Math.min(100, volume));
@@ -147,6 +161,11 @@ window.addEventListener('message', (event) => {
             break;
         case 'setVolume':
             if (data.volume !== undefined) setVolume(data.volume);
+            break;
+        case 'updateNowPlaying':
+            if (data.songTitle !== undefined) {
+                updateNowPlaying(data.songTitle);
+            }
             break;
     }
 });

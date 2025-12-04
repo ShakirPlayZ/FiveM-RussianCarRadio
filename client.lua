@@ -247,28 +247,22 @@ function StartMetadataDisplay()
         end)
     end
     
-    Citizen.CreateThread(function()
-        while showMetadata and isPlaying do
-            Citizen.Wait(0)
-            
-            SetTextFont(4)
-            SetTextProportional(1)
-            SetTextScale(0.0, 0.45)
-            SetTextColour(255, 51, 51, 255)
-            SetTextDropshadow(0, 0, 0, 0, 255)
-            SetTextEdge(1, 0, 0, 0, 255)
-            SetTextDropShadow()
-            SetTextOutline()
-            SetTextEntry("STRING")
-            AddTextComponentString("🎵 " .. currentMetadata)
-            DrawText(0.85, 0.02)
-        end
-    end)
+    -- Sende initial "Lädt..." ans UI
+    SendNUIMessage({
+        action = "updateNowPlaying",
+        songTitle = "Lädt..."
+    })
 end
 
 function StopMetadataDisplay()
     showMetadata = false
     currentMetadata = "Lädt..."
+    
+    -- Reset UI Display
+    SendNUIMessage({
+        action = "updateNowPlaying",
+        songTitle = ""
+    })
 end
 
 RegisterNetEvent('radio:receiveMetadata')
@@ -278,6 +272,12 @@ AddEventHandler('radio:receiveMetadata', function(songTitle, listeners)
         if Config.showListeners and listeners then
             currentMetadata = songTitle .. " | 👥 " .. listeners
         end
+        
+        -- Sende Metadata ans UI
+        SendNUIMessage({
+            action = "updateNowPlaying",
+            songTitle = currentMetadata
+        })
     end
 end)
 
