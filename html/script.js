@@ -23,10 +23,10 @@ const statusText = document.getElementById('statusText');
 // Update Display
 function updateDisplay() {
     if (isPlaying) {
-        statusText.textContent = '播放';
+        statusText.textContent = 'EIN';
         statusText.style.color = '#00ff00';
     } else {
-        statusText.textContent = 'ВЫКЛ';
+        statusText.textContent = 'AUS';
         statusText.style.color = '#ff3333';
     }
 }
