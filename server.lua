@@ -1,4 +1,4 @@
--- Russian Car Radio Server Script
+-- Blyad Radio Server Script
 -- Fetcht Metadata vom Icecast2 Server
 
 local METADATA_URL = "https://service4gamer.net/streamstatus"
@@ -20,7 +20,7 @@ Citizen.CreateThread(function()
                 
                 if songTitle and songTitle ~= "" then
                     currentSongTitle = songTitle
-                    print("[Radio Metadata] Song: " .. currentSongTitle)
+                    --print("[Radio Metadata] Song: " .. currentSongTitle)
                 else
                     currentSongTitle = "Unbekannt"
                 end

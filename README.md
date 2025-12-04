@@ -1,6 +1,29 @@
-# Russian Car Radio - xsound Version
+# Blyad Radio - xsound Version
 
 Ein FiveM Plugin für GTA 5 RP Server mit **xsound** - löst alle CORS/NUI Probleme! 🎵
+
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/ShakirPlayZ/FiveM-RussianCarRadio)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![FiveM](https://img.shields.io/badge/FiveM-Compatible-orange.svg)](https://fivem.net)
+[![Author](https://img.shields.io/badge/author-Manuel%20H.-red.svg)](https://github.com/ShakirPlayZ)
+
+## 🎉 Neueste Updates (v2.1.0)
+
+- 🎵 **Song Metadata Display**: Aktueller Song wird als Lauftext angezeigt
+- ✅ **Live-Updates**: Alle 10 Sekunden neue Song-Info
+- ✅ **HTML-Parsing**: Liest Daten aus Icecast2 Status-Seite
+- ✅ **Kontinuierliches Streaming**: Songs spielen automatisch durch
+- ✅ **HTTPS Support**: Sichere SSL-verschlüsselte Verbindung
+
+[📋 Alle Änderungen ansehen](CHANGELOG.md)
+
+---
+
+## 📸 Screenshot
+
+![Lauftext Anzeige](https://via.placeholder.com/600x100/1a1a1a/ff3333?text=%F0%9F%8E%B5+Daniel+Deluxe+-+Instruments+of+Retribution)
+
+*Aktueller Song wird oben rechts als Lauftext angezeigt*
 
 ## ✅ Warum xsound?
 
@@ -13,7 +36,7 @@ Ein FiveM Plugin für GTA 5 RP Server mit **xsound** - löst alle CORS/NUI Probl
 ✅ **Icecast2 Streaming** - Direkt vom Server
 ✅ **3D Positional Audio** - Sound kommt aus dem Fahrzeug
 ✅ **Keine CORS Probleme** - xsound umgeht NUI komplett
-✅ **Russisches Radio-Design** - Retro-Optik
+✅ **Blyad Radio Design** - Retro-Optik mit Style 😎
 ✅ **Lautstärkeregelung** - Präzise Kontrolle
 ✅ **Minimize-Funktion** - Stört nicht beim Fahren
 ✅ **Nur für Fahrer** - Nur Fahrer kann Radio bedienen
@@ -62,7 +85,7 @@ Ein FiveM Plugin für GTA 5 RP Server mit **xsound** - löst alle CORS/NUI Probl
 
 Ändere in `client.lua` (Zeile ~11):
 ```lua
-local STREAM_URL = "https://TLD/your-mount"
+local STREAM_URL = "https://service4gamer.net/live"
 ```
 
 Die URL nutzt jetzt **HTTPS mit SSL** für bessere Sicherheit und Kompatibilität! 🔒
@@ -74,8 +97,9 @@ In `client.lua` (Zeile ~19):
 local Config = {
     use3DSound = true,        -- true = Sound aus Fahrzeug, false = direkt im Kopf
     maxDistance = 30.0,       -- Maximale Hör-Distanz in Metern (nur bei 3D)
-    radioKey = 85,            -- 38 = E-Taste, 85 = Q
-    maxVolume = 100
+    radioKey = 85,            -- 85 = Q-Taste
+    maxVolume = 100,
+    showListeners = false     -- Zeige Zuhörer-Anzahl im Lauftext 🆕
 }
 ```
 
@@ -85,7 +109,7 @@ local Config = {
 **Lösung:** xsound ist nicht installiert oder nicht gestartet
 ```bash
 /ensure xsound
-/restart FiveM-RussianCarRadio
+/restart russian_car_radio
 ```
 
 ### Problem: Kein Ton
@@ -97,7 +121,14 @@ local Config = {
 ### Problem: Radio öffnet sich nicht
 **Lösung:**
 - Nur als Fahrer (nicht als Beifahrer)
-- Drücke E-Taste
+- Drücke Q-Taste
+
+### Problem: Song-Anzeige zeigt "Lädt..."
+**Lösung:**
+- Teste mit `/radioinfo` Command
+- Prüfe ob Server `server.lua` lädt
+- Prüfe Server-Logs für Metadata-Fehler
+- URL muss erreichbar sein: https://service4gamer.net/streamstatus
 
 ## 🆚 xsound vs. normale Version
 

@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Manuel H.'
-description 'Russisches Auto-Radio mit Musik-Streaming (xsound version) + Metadata Display'
+description 'Blyad Radio - Auto-Radio mit Musik-Streaming (xsound version) + Metadata Display'
 version '2.1.0'
 
 -- Dependencies

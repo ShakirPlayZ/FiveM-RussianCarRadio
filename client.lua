@@ -1,4 +1,4 @@
--- Russian Car Radio Client Script mit xsound
+-- Blyad Radio Client Script mit xsound
 -- Erfordert: xsound (https://github.com/Xogy/xsound)
 
 local isInVehicle = false
@@ -37,7 +37,7 @@ Citizen.CreateThread(function()
             -- Spieler ist Fahrer eines Fahrzeugs
             if not isInVehicle then
                 isInVehicle = true
-                ShowHelpNotification("Drücke ~INPUT_PICKUP~ um das Radio zu öffnen")
+                ShowHelpNotification("Drücke ~INPUT_VEH_FLY_ATTACK_CAMERA~ um das Radio zu öffnen")
             end
             
             -- Update 3D Sound Position wenn aktiviert
@@ -67,7 +67,7 @@ Citizen.CreateThread(function()
         Citizen.Wait(0)
         
         if isInVehicle then
-            if IsControlJustReleased(0, Config.radioKey) then -- E-Taste
+            if IsControlJustReleased(0, Config.radioKey) then -- Q-Taste
                 ToggleRadio()
             end
         end
@@ -127,18 +127,43 @@ function PlayRadio()
     end
     
     -- Erstelle Sound mit xsound
-    -- WICHTIG: loop=true für kontinuierliches Streaming (Icecast Stream läuft durch)
+    -- WICHTIG: loop=false bei Streams! (Stream ist bereits endlos)
     if Config.use3DSound then
         local coords = GetEntityCoords(vehicle)
-        exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, true) -- true = loop
+        exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
         exports.xsound:Distance(SOUND_ID, Config.maxDistance)
-        print("[Radio] Playing 3D stream (looped)")
+        print("[Radio] Playing 3D stream")
     else
-        exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, true) -- true = loop
-        print("[Radio] Playing 2D stream (looped)")
+        exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
+        print("[Radio] Playing 2D stream")
     end
     
     isPlaying = true
+    
+    -- xsound Event Listener für Stream-Ende (sollte bei Streams nicht passieren)
+    exports.xsound:onPlayEnd(SOUND_ID, function(eventData)
+        print("[Radio] ⚠️ Stream ended unexpectedly - Restarting...")
+        
+        -- Warte kurz und starte neu
+        Citizen.Wait(500)
+        
+        if isPlaying then
+            local playerPed = PlayerPedId()
+            local vehicle = GetVehiclePedIsIn(playerPed, false)
+            
+            if vehicle ~= 0 then
+                -- Reconnect
+                if Config.use3DSound then
+                    local coords = GetEntityCoords(vehicle)
+                    exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
+                    exports.xsound:Distance(SOUND_ID, Config.maxDistance)
+                else
+                    exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
+                end
+                print("[Radio] ✅ Stream reconnected")
+            end
+        end
+    end)
     
     -- Starte Metadata-Anzeige
     StartMetadataDisplay()

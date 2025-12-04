@@ -8,6 +8,16 @@
 - ✅ **HTML-Parsing**: Liest Daten direkt aus Icecast2 Status-Seite
 - ✅ **Optional**: Zeige auch Zuhörer-Anzahl
 
+### ⚙️ Customization
+- ✅ **Radio-Name**: "Blyad Radio" statt "Russian Car Radio"
+- ✅ **Taste geändert**: Q-Taste (85) statt E-Taste (38)
+- ✅ **Author**: Manuel H.
+
+### 🔧 Fixed
+- ✅ **xsound Loop**: loop=false für Streams (loop=true verursachte Probleme)
+- ✅ **Auto-Reconnect**: xsound onPlayEnd Event für automatischen Neustart
+- ✅ **Stream-Stabilität**: Besseres Handling bei Stream-Unterbrechungen
+
 ### 📝 Details
 
 #### Was wird angezeigt:

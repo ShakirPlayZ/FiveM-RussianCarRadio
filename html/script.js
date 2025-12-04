@@ -1,4 +1,4 @@
-// Russian Car Radio - JavaScript Logic (xsound version)
+// Blyad Radio - JavaScript Logic (xsound version)
 // xsound übernimmt das Audio-Streaming, NUI nur für UI
 
 let currentVolume = 50;
@@ -134,7 +134,7 @@ function GetParentResourceName() {
     try {
         return window.location.hostname.split('.')[0];
     } catch (e) {
-        return 'russian_car_radio';
+        return 'blyad_radio';
     }
 }
 
