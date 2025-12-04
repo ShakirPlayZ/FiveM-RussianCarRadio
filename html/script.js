@@ -153,8 +153,19 @@ window.addEventListener('message', (event) => {
 
 function GetParentResourceName() {
     try {
+        // FiveM NUI URLs: cfx-nui-RESOURCENAME
+        const hostname = window.location.hostname;
+        console.log('🔍 [DEBUG] Full hostname:', hostname);
+        
+        if (hostname.startsWith('cfx-nui-')) {
+            const resourceName = hostname.replace('cfx-nui-', '');
+            console.log('✅ [DEBUG] Extracted resource name:', resourceName);
+            return resourceName;
+        }
+        
         return window.location.hostname.split('.')[0];
     } catch (e) {
+        console.error('❌ [DEBUG] Error:', e);
         return 'blyad_radio';
     }
 }
