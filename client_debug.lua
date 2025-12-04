@@ -1,11 +1,10 @@
--- Blyad Radio Client Script mit xsound
+-- Blyad Radio Client Script mit xsound - DEBUG VERSION
 -- Erfordert: xsound (https://github.com/Xogy/xsound)
 
 local isInVehicle = false
 local radioVisible = false
 local currentVolume = 50
 local isPlaying = false
-local radioSound = nil
 
 -- FESTE STREAM URL - HTTPS mit SSL
 local STREAM_URL = "https://service4gamer.net/live"
@@ -25,6 +24,28 @@ local Config = {
     showListeners = false
 }
 
+-- DEBUG: Prüfe xsound beim Start
+Citizen.CreateThread(function()
+    Citizen.Wait(2000)
+    
+    if exports.xsound then
+        print("✅ [Radio DEBUG] xsound export gefunden!")
+        
+        -- Teste xsound
+        local testWorked = pcall(function()
+            exports.xsound:getInfo(SOUND_ID)
+        end)
+        
+        if testWorked then
+            print("✅ [Radio DEBUG] xsound funktioniert!")
+        else
+            print("❌ [Radio DEBUG] xsound antwortet nicht korrekt")
+        end
+    else
+        print("❌ [Radio DEBUG] xsound export NICHT gefunden! Ist xsound gestartet?")
+    end
+end)
+
 -- Initialisierung
 Citizen.CreateThread(function()
     while true do
@@ -38,17 +59,13 @@ Citizen.CreateThread(function()
             if not isInVehicle then
                 isInVehicle = true
                 ShowHelpNotification("Drücke ~INPUT_VEH_FLY_ATTACK_CAMERA~ um das Radio zu öffnen")
-            end
-            
-            -- Update 3D Sound Position wenn aktiviert
-            if isPlaying and Config.use3DSound and radioSound then
-                local coords = GetEntityCoords(vehicle)
-                exports.xsound:Position(SOUND_ID, coords.x, coords.y, coords.z)
+                print("✅ [Radio DEBUG] Spieler ist jetzt Fahrer")
             end
         else
             -- Spieler ist nicht in einem Fahrzeug
             if isInVehicle then
                 isInVehicle = false
+                print("⚠️ [Radio DEBUG] Spieler hat Fahrzeug verlassen")
                 if radioVisible then
                     CloseRadio()
                 end
@@ -68,6 +85,7 @@ Citizen.CreateThread(function()
         
         if isInVehicle then
             if IsControlJustReleased(0, Config.radioKey) then -- Q-Taste
+                print("🎯 [Radio DEBUG] Q-Taste gedrückt")
                 ToggleRadio()
             end
         end
@@ -83,8 +101,10 @@ function ToggleRadio()
     radioVisible = not radioVisible
     
     if radioVisible then
+        print("📻 [Radio DEBUG] Radio wird geöffnet")
         OpenRadio()
     else
+        print("📻 [Radio DEBUG] Radio wird geschlossen")
         CloseRadio()
     end
 end
@@ -99,6 +119,7 @@ function OpenRadio()
         isPlaying = isPlaying
     })
     radioVisible = true
+    print("✅ [Radio DEBUG] Radio UI geöffnet")
 end
 
 -- Radio schließen
@@ -109,12 +130,15 @@ function CloseRadio()
         action = "closeRadio"
     })
     radioVisible = false
+    print("✅ [Radio DEBUG] Radio UI geschlossen")
 end
 
 -- Radio abspielen mit xsound
 function PlayRadio()
+    print("🎵 [Radio DEBUG] PlayRadio() aufgerufen")
+    
     if isPlaying then
-        print("[Radio] Already playing")
+        print("⚠️ [Radio DEBUG] Already playing")
         return
     end
     
@@ -122,48 +146,43 @@ function PlayRadio()
     local vehicle = GetVehiclePedIsIn(playerPed, false)
     
     if vehicle == 0 then
-        print("[Radio] Not in vehicle")
+        print("❌ [Radio DEBUG] Not in vehicle")
         return
     end
     
-    -- Erstelle Sound mit xsound
-    -- WICHTIG: loop=false bei Streams! (Stream ist bereits endlos)
-    if Config.use3DSound then
-        local coords = GetEntityCoords(vehicle)
-        exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
-        exports.xsound:Distance(SOUND_ID, Config.maxDistance)
-        print("[Radio] Playing 3D stream")
-    else
-        exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
-        print("[Radio] Playing 2D stream")
+    print("🔊 [Radio DEBUG] Versuche Stream zu starten...")
+    print("🔊 [Radio DEBUG] URL: " .. STREAM_URL)
+    print("🔊 [Radio DEBUG] Volume: " .. (currentVolume / 100))
+    print("🔊 [Radio DEBUG] 3D Sound: " .. tostring(Config.use3DSound))
+    
+    -- Prüfe ob xsound verfügbar ist
+    if not exports.xsound then
+        print("❌ [Radio DEBUG] xsound export nicht verfügbar!")
+        return
+    end
+    
+    -- Versuche Sound zu erstellen
+    local success, error = pcall(function()
+        if Config.use3DSound then
+            local coords = GetEntityCoords(vehicle)
+            print("🔊 [Radio DEBUG] Starte 3D Stream an Position: " .. coords.x .. ", " .. coords.y .. ", " .. coords.z)
+            exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
+            exports.xsound:Distance(SOUND_ID, Config.maxDistance)
+            print("✅ [Radio DEBUG] PlayUrlPos aufgerufen")
+        else
+            print("🔊 [Radio DEBUG] Starte 2D Stream")
+            exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
+            print("✅ [Radio DEBUG] PlayUrl aufgerufen")
+        end
+    end)
+    
+    if not success then
+        print("❌ [Radio DEBUG] Fehler beim Starten: " .. tostring(error))
+        return
     end
     
     isPlaying = true
-    
-    -- xsound Event Listener für Stream-Ende (sollte bei Streams nicht passieren)
-    exports.xsound:onPlayEnd(SOUND_ID, function(eventData)
-        print("[Radio] ⚠️ Stream ended unexpectedly - Restarting...")
-        
-        -- Warte kurz und starte neu
-        Citizen.Wait(500)
-        
-        if isPlaying then
-            local playerPed = PlayerPedId()
-            local vehicle = GetVehiclePedIsIn(playerPed, false)
-            
-            if vehicle ~= 0 then
-                -- Reconnect
-                if Config.use3DSound then
-                    local coords = GetEntityCoords(vehicle)
-                    exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
-                    exports.xsound:Distance(SOUND_ID, Config.maxDistance)
-                else
-                    exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
-                end
-                print("[Radio] ✅ Stream reconnected")
-            end
-        end
-    end)
+    print("✅ [Radio DEBUG] isPlaying = true")
     
     -- Starte Metadata-Anzeige
     StartMetadataDisplay()
@@ -173,6 +192,21 @@ function PlayRadio()
         action = "updatePlaying",
         isPlaying = true
     })
+    
+    -- Warte kurz und prüfe Status
+    Citizen.CreateThread(function()
+        Citizen.Wait(2000)
+        
+        local soundInfo = exports.xsound:getInfo(SOUND_ID)
+        if soundInfo then
+            print("🔊 [Radio DEBUG] Sound Info nach 2s:")
+            print("   - Playing: " .. tostring(soundInfo.playing))
+            print("   - Volume: " .. tostring(soundInfo.volume))
+            print("   - URL: " .. tostring(soundInfo.url))
+        else
+            print("❌ [Radio DEBUG] Kein Sound Info verfügbar!")
+        end
+    end)
 end
 
 -- Radio stoppen
@@ -181,6 +215,8 @@ function StopRadio()
         return
     end
     
+    print("⏹️ [Radio DEBUG] Stoppe Radio")
+    
     -- Stoppe Sound mit xsound
     exports.xsound:Destroy(SOUND_ID)
     isPlaying = false
@@ -188,7 +224,7 @@ function StopRadio()
     -- Stoppe Metadata-Anzeige
     StopMetadataDisplay()
     
-    print("[Radio] Stopped")
+    print("✅ [Radio DEBUG] Stopped")
     
     -- Update NUI
     SendNUIMessage({
@@ -201,29 +237,35 @@ end
 function SetRadioVolume(volume)
     currentVolume = volume
     
+    print("🔊 [Radio DEBUG] Setze Lautstärke: " .. volume)
+    
     if isPlaying then
         exports.xsound:setVolume(SOUND_ID, currentVolume / 100)
-        print("[Radio] Volume set to: " .. currentVolume)
+        print("✅ [Radio DEBUG] Volume set to: " .. currentVolume)
     end
 end
 
 -- NUI Callbacks
 RegisterNUICallback('close', function(data, cb)
+    print("📻 [Radio DEBUG] NUI Close callback")
     CloseRadio()
     cb('ok')
 end)
 
 RegisterNUICallback('play', function(data, cb)
+    print("▶️ [Radio DEBUG] NUI Play callback")
     PlayRadio()
     cb('ok')
 end)
 
 RegisterNUICallback('pause', function(data, cb)
+    print("⏸️ [Radio DEBUG] NUI Pause callback")
     StopRadio()
     cb('ok')
 end)
 
 RegisterNUICallback('volumeChange', function(data, cb)
+    print("🔊 [Radio DEBUG] NUI Volume callback: " .. data.volume)
     SetRadioVolume(data.volume)
     cb('ok')
 end)
@@ -238,6 +280,7 @@ end
 -- Beim Ressourcen-Stopp aufräumen
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() == resourceName then
+        print("🛑 [Radio DEBUG] Resource wird gestoppt")
         if radioVisible then
             SetNuiFocus(false, false)
         end
@@ -318,3 +361,5 @@ AddEventHandler('radio:receiveMetadata', function(songTitle, listeners)
         print("[Radio] Metadata update: " .. currentMetadata)
     end
 end)
+
+print("✅ [Radio DEBUG] Client Script geladen")

@@ -82,10 +82,20 @@ closeBtn.addEventListener('click', closeRadio);
 minimizeBtn.addEventListener('click', toggleMinimize);
 
 playBtn.addEventListener('click', () => {
+    console.log('🎮 [NUI] Play Button clicked!');
+    console.log('🎮 [NUI] Sending to:', `https://${GetParentResourceName()}/play`);
+    
     fetch(`https://${GetParentResourceName()}/play`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({})
+    })
+    .then(resp => {
+        console.log('✅ [NUI] Play request sent successfully');
+        return resp.json();
+    })
+    .catch(err => {
+        console.error('❌ [NUI] Play request failed:', err);
     });
 });
 

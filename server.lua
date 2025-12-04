@@ -20,7 +20,7 @@ Citizen.CreateThread(function()
                 
                 if songTitle and songTitle ~= "" then
                     currentSongTitle = songTitle
-                    --print("[Radio Metadata] Song: " .. currentSongTitle)
+                    print("[Radio Metadata] Song: " .. currentSongTitle)
                 else
                     currentSongTitle = "Unbekannt"
                 end
