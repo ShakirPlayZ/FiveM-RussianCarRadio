@@ -21,10 +21,10 @@ const statusText = document.getElementById('statusText');
 // Update Display
 function updateDisplay() {
     if (isPlaying) {
-        statusText.textContent = 'AN';
+        statusText.textContent = 'Ein';
         statusText.style.color = '#00ff00';
     } else {
-        statusText.textContent = 'AUS';
+        statusText.textContent = 'Aus';
         statusText.style.color = '#ff3333';
     }
 }

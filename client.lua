@@ -12,7 +12,7 @@ local SOUND_ID = "car_radio_stream"
 local Config = {
     radioKey = 85, -- Q-Taste
     maxVolume = 100,
-    use3DSound = true,
+    use3DSound = false, -- 2D Sound - 3D hatte Fade-Out Probleme beim Fahren
     maxDistance = 30.0,
     showListeners = false
 }
