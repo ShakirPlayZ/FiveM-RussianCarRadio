@@ -6,8 +6,19 @@ local radioVisible = false
 local currentVolume = 50
 local isPlaying = false
 
-local STREAM_URL = "https://service4gamer.net/live"
 local SOUND_ID = "car_radio_stream"
+
+-- RADIO STATIONS
+local stations = {
+    {name = "RUSSIAN", mount = "russian", url = "https://service4gamer.net/radio/russian"},
+    {name = "BLYAD", mount = "russian_neu", url = "https://service4gamer.net/radio/russian_neu"},
+    {name = "CYBERPUNK", mount = "cyberpunk", url = "https://service4gamer.net/cyberpunk"},
+    {name = "TECHNO", mount = "techno", url = "https://service4gamer.net/techno"},
+    {name = "FAMILIE", mount = "familie", url = "https://service4gamer.net/familie"},
+    {name = "LANG", mount = "lang", url = "https://service4gamer.net/lang"},
+}
+
+local currentStationIndex = 1 -- Startet mit RUSSIAN
 
 local Config = {
     radioKey = 85, -- Q-Taste
@@ -18,6 +29,7 @@ local Config = {
 }
 
 print("🎵 [Blyad Radio] Loading...")
+print("📻 " .. #stations .. " Stationen verfügbar")
 
 -- Initialisierung
 Citizen.CreateThread(function()
@@ -78,7 +90,8 @@ function OpenRadio()
     SendNUIMessage({
         action = "openRadio",
         volume = currentVolume,
-        isPlaying = isPlaying
+        isPlaying = isPlaying,
+        currentStation = stations[currentStationIndex].name
     })
     radioVisible = true
 end
@@ -94,7 +107,8 @@ function CloseRadio()
 end
 
 function PlayRadio()
-    print("🎵 [Radio] Starting playback...")
+    local station = stations[currentStationIndex]
+    print("🎵 [Radio] Playing: " .. station.name .. " (" .. station.url .. ")")
     
     if isPlaying then
         print("⚠️ [Radio] Already playing, restarting...")
@@ -117,15 +131,15 @@ function PlayRadio()
     
     Citizen.Wait(100)
     
-    -- Starte Stream
+    -- Starte Stream mit aktueller Station
     local success = pcall(function()
         if Config.use3DSound then
             local coords = GetEntityCoords(vehicle)
-            exports.xsound:PlayUrlPos(SOUND_ID, STREAM_URL, currentVolume / 100, coords, false)
+            exports.xsound:PlayUrlPos(SOUND_ID, station.url, currentVolume / 100, coords, false)
             exports.xsound:Distance(SOUND_ID, Config.maxDistance)
             print("✅ [Radio] 3D Stream started")
         else
-            exports.xsound:PlayUrl(SOUND_ID, STREAM_URL, currentVolume / 100, false)
+            exports.xsound:PlayUrl(SOUND_ID, station.url, currentVolume / 100, false)
             print("✅ [Radio] 2D Stream started")
         end
     end)
@@ -144,6 +158,12 @@ function PlayRadio()
     SendNUIMessage({
         action = "updatePlaying",
         isPlaying = true
+    })
+    
+    -- Update Station Display
+    SendNUIMessage({
+        action = "updateStation",
+        stationName = station.name
     })
     
     -- Status Check nach 2 Sekunden
@@ -180,6 +200,47 @@ function SetRadioVolume(volume)
     end
 end
 
+-- Station wechseln
+function NextStation()
+    currentStationIndex = currentStationIndex + 1
+    if currentStationIndex > #stations then
+        currentStationIndex = 1
+    end
+    
+    local station = stations[currentStationIndex]
+    print("📻 [Station] Nächste: " .. station.name)
+    
+    SendNUIMessage({
+        action = "updateStation",
+        stationName = station.name
+    })
+    
+    -- Wenn Musik läuft, wechsle Stream
+    if isPlaying then
+        PlayRadio()
+    end
+end
+
+function PreviousStation()
+    currentStationIndex = currentStationIndex - 1
+    if currentStationIndex < 1 then
+        currentStationIndex = #stations
+    end
+    
+    local station = stations[currentStationIndex]
+    print("📻 [Station] Vorherige: " .. station.name)
+    
+    SendNUIMessage({
+        action = "updateStation",
+        stationName = station.name
+    })
+    
+    -- Wenn Musik läuft, wechsle Stream
+    if isPlaying then
+        PlayRadio()
+    end
+end
+
 -- NUI Callbacks mit korrektem JSON Response
 RegisterNUICallback('close', function(data, cb)
     print("📻 [NUI] Close")
@@ -203,6 +264,16 @@ RegisterNUICallback('volumeChange', function(data, cb)
     if data and data.volume then
         SetRadioVolume(data.volume)
     end
+    cb({status = 'ok'})
+end)
+
+RegisterNUICallback('nextStation', function(data, cb)
+    NextStation()
+    cb({status = 'ok'})
+end)
+
+RegisterNUICallback('prevStation', function(data, cb)
+    PreviousStation()
     cb({status = 'ok'})
 end)
 
@@ -234,14 +305,16 @@ local showMetadata = false
 
 function StartMetadataDisplay()
     showMetadata = true
-    TriggerServerEvent('radio:requestMetadata')
+    local station = stations[currentStationIndex]
+    TriggerServerEvent('radio:requestMetadata', station.mount)
     
     if metadataThread == nil then
         metadataThread = Citizen.CreateThread(function()
             while showMetadata do
                 Citizen.Wait(10000)
                 if isPlaying then
-                    TriggerServerEvent('radio:requestMetadata')
+                    local currentStation = stations[currentStationIndex]
+                    TriggerServerEvent('radio:requestMetadata', currentStation.mount)
                 end
             end
             metadataThread = nil

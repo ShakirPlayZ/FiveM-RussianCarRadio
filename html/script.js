@@ -17,14 +17,17 @@ const volumeValue = document.getElementById('volumeValue');
 const volUpBtn = document.getElementById('volUp');
 const volDownBtn = document.getElementById('volDown');
 const statusText = document.getElementById('statusText');
+const prevStationBtn = document.getElementById('prevStation');
+const nextStationBtn = document.getElementById('nextStation');
+const stationNameDisplay = document.getElementById('stationName');
 
 // Update Display
 function updateDisplay() {
     if (isPlaying) {
-        statusText.textContent = 'Ein';
+        statusText.textContent = '播放';
         statusText.style.color = '#00ff00';
     } else {
-        statusText.textContent = 'Aus';
+        statusText.textContent = 'ВЫКЛ';
         statusText.style.color = '#ff3333';
     }
 }
@@ -40,6 +43,13 @@ function updateNowPlaying(songTitle) {
             nowPlayingText.textContent = isPlaying ? 'Lädt...' : 'Kein Song';
             nowPlayingText.style.color = isPlaying ? '#ffaa00' : '#666';
         }
+    }
+}
+
+// Update Station Display
+function updateStation(stationName) {
+    if (stationNameDisplay) {
+        stationNameDisplay.textContent = stationName;
     }
 }
 
@@ -121,6 +131,22 @@ volumeSlider.addEventListener('input', (e) => setVolume(parseInt(e.target.value)
 volUpBtn.addEventListener('click', () => setVolume(currentVolume + 5));
 volDownBtn.addEventListener('click', () => setVolume(currentVolume - 5));
 
+prevStationBtn.addEventListener('click', () => {
+    fetch(`https://${GetParentResourceName()}/prevStation`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({})
+    }).catch(err => console.error('Prev station error:', err));
+});
+
+nextStationBtn.addEventListener('click', () => {
+    fetch(`https://${GetParentResourceName()}/nextStation`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({})
+    }).catch(err => console.error('Next station error:', err));
+});
+
 document.addEventListener('keyup', (e) => {
     if (e.key === 'Escape') closeRadio();
 });
@@ -133,6 +159,7 @@ window.addEventListener('message', (event) => {
             radioContainer.classList.remove('hidden');
             if (data.volume !== undefined) setVolume(data.volume);
             if (data.isPlaying !== undefined) isPlaying = data.isPlaying;
+            if (data.currentStation !== undefined) updateStation(data.currentStation);
             updateDisplay();
             break;
         case 'closeRadio':
@@ -150,6 +177,11 @@ window.addEventListener('message', (event) => {
         case 'updateNowPlaying':
             if (data.songTitle !== undefined) {
                 updateNowPlaying(data.songTitle);
+            }
+            break;
+        case 'updateStation':
+            if (data.stationName !== undefined) {
+                updateStation(data.stationName);
             }
             break;
     }

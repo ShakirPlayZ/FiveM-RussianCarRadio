@@ -184,6 +184,70 @@ body {
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
 }
 
+/* Station Selector */
+.station-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border: 2px solid #3a3a3a;
+    border-radius: 10px;
+}
+
+.station-btn {
+    background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+    border: 2px solid #4a4a4a;
+    color: #ff3333;
+    font-size: 20px;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.station-btn:hover {
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    border-color: #ff3333;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+}
+
+.station-btn:active {
+    transform: scale(0.95);
+}
+
+.station-display {
+    flex: 1;
+    text-align: center;
+}
+
+.station-label {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.station-name-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
 /* Station Info Section */
 .station-info {
     background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
