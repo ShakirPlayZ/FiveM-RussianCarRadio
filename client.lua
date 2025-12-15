@@ -11,17 +11,16 @@ local SOUND_ID = "car_radio_stream"
 -- RADIO STATIONS
 local stations = {
     {name = "RUSSIAN", mount = "russian", url = "https://service4gamer.net/radio/russian"},
-    {name = "BLYAD", mount = "russian_neu", url = "https://service4gamer.net/radio/russian_neu"},
-    {name = "CYBERPUNK", mount = "cyberpunk", url = "https://service4gamer.net/cyberpunk"},
-    {name = "TECHNO", mount = "techno", url = "https://service4gamer.net/techno"},
-    {name = "FAMILIE", mount = "familie", url = "https://service4gamer.net/familie"},
-    {name = "LANG", mount = "lang", url = "https://service4gamer.net/lang"},
+    {name = "CYBERPUNK", mount = "cyberpunk", url = "https://service4gamer.net/radio/cyberpunk"},
+    {name = "TECHNO", mount = "techno", url = "https://service4gamer.net/radio/techno"},
+    {name = "FAMILIE", mount = "familie", url = "https://service4gamer.net/radio/familie"},
+    {name = "LATE NIGHT", mount = "lang", url = "https://service4gamer.net/radio/lang"},
 }
 
 local currentStationIndex = 1 -- Startet mit RUSSIAN
 
 local Config = {
-    radioKey = 85, -- Q-Taste
+    radioKey = 214, -- Q-Taste
     maxVolume = 100,
     use3DSound = false, -- 2D Sound - 3D hatte Fade-Out Probleme beim Fahren
     maxDistance = 30.0,
