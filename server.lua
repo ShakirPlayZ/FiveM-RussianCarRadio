@@ -8,7 +8,6 @@ local UPDATE_INTERVAL = 10000 -- 10 Sekunden
 -- Metadata Cache für jede Station
 local stationMetadata = {
     russian = {song = "Lädt...", listeners = 0},
-    russian_neu = {song = "Lädt...", listeners = 0},
     cyberpunk = {song = "Lädt...", listeners = 0},
     techno = {song = "Lädt...", listeners = 0},
     familie = {song = "Lädt...", listeners = 0},
@@ -21,28 +20,31 @@ Citizen.CreateThread(function()
         Citizen.Wait(UPDATE_INTERVAL)
         
         -- Fetch Metadata einmal für alle Stationen
-        -- Icecast status.xsl zeigt alle Mounts auf einer Seite
         PerformHttpRequest(METADATA_URL, function(statusCode, response, headers)
             if statusCode == 200 and response then
                 print("[Radio Metadata] Status abgerufen (" .. string.len(response) .. " bytes)")
                 
                 -- Parse Metadata für jede Station
                 for mount, data in pairs(stationMetadata) do
-                    -- Mount-spezifisches Pattern
-                    -- Icecast HTML Format: <td class="mount-point">/MOUNT</td>
-                    local mountPattern = '<td class="mount%-point">/' .. mount .. '</td>'
+                    -- Mount Pattern: <h3 class="mount">Mount Point /MOUNT</h3>
+                    local mountPattern = 'class="mount">Mount Point /' .. mount .. '</h3>'
                     local mountPos = response:find(mountPattern)
                     
                     if mountPos then
-                        -- Suche nach "Currently playing" nach dem mount
+                        -- Suche nach "Currently playing" oder "Currentlyplaying" nach dem mount
                         local afterMount = response:sub(mountPos)
+                        
+                        -- Versuche beide Varianten (mit und ohne Leerzeichen)
                         local songTitle = afterMount:match('<td>Currently playing:</td>%s*<td class="streamstats">(.-)</td>')
+                        if not songTitle or songTitle == "" then
+                            songTitle = afterMount:match('<td>Currentlyplaying:</td>%s*<td class="streamstats">(.-)</td>')
+                        end
                         
                         if songTitle and songTitle ~= "" and songTitle ~= "-" then
                             data.song = songTitle
                             print("[Radio Metadata] " .. mount .. ": " .. songTitle)
                         else
-                            data.song = "Unbekannter Titel"
+                            data.song = "Kein Titel"
                         end
                         
                         -- Parse Listeners für diesen Mount
